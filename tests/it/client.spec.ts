@@ -275,14 +275,14 @@ describe('trino spooling protocol', () => {
     });
 
     // Use customer table which we know has data, with a larger limit
-    const massiveQuery = `SELECT * FROM customer LIMIT 20000`;
+    const massiveQuery = `SELECT * FROM customer LIMIT 100000`;
         
     const iter = await trino.query(massiveQuery);
     const data = await iter
       .map(r => r.data ?? [])
       .fold<QueryData[]>([], (row, acc) => [...acc, ...row]); 
 
-    expect(data.length).toBe(20000)
+    expect(data.length).toBe(100000)
     
     // Verify we got valid customer table structure (18 columns)
     expect(data[0]).toBeDefined();

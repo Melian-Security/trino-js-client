@@ -119,7 +119,7 @@ export class SpoolingProcessor {
   /**
    * Process all segments and return combined rows
    */
-  static async processSegments(segments: SegmentWrapper[], client: any): Promise<QueryRows> {
+  static async processSegments(segments: SegmentWrapper[]): Promise<QueryRows> {
     const allRows: QueryRows = [];
 
     for (const segmentWrapper of segments) {
@@ -165,11 +165,8 @@ export class SpoolingProcessor {
             allRows.push(...rows);
           }
 
-          // Acknowledge the segment (fire and forget) - through Trino client
-          client.request({
-            method: 'POST',
-            url: spooledSegment.ackUri,
-            data: null,
+          // Acknowledge the segment (fire and forget) - direct axios call
+          axios.get(spooledSegment.ackUri, {
             timeout: 2000 // 2 second timeout for acknowledgments
           }).catch((error: Error) => {
             console.warn('Failed to acknowledge segment:', error);

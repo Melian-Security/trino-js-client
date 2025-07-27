@@ -425,7 +425,7 @@ export class QueryIterator implements AsyncIterableIterator<QueryResult> {
     if (SpoolingProcessor.isSpoolingResponse(this.queryResult.data)) {
       const spooledData = this.queryResult.data as unknown as SpooledProtocolResponse;
       const segments = SpoolingProcessor.toSegments(spooledData);
-      const processedRows = await SpoolingProcessor.processSegments(segments, this.client);
+      const processedRows = await SpoolingProcessor.processSegments(segments);
       
       // Replace the spooled data with processed rows
       this.queryResult = {
