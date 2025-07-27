@@ -34,7 +34,7 @@ spec:
             - name: MINIO_ROOT_PASSWORD
               value: "minioadmin"
             - name: MINIO_SERVER_URL
-              value: "http://minio.127.0.0.1.nip.io:30900"
+              value: "http://minio:9000"
             - name: MINIO_BROWSER_REDIRECT_URL
               value: "http://minio-console.127.0.0.1.nip.io:30901"
           ports:

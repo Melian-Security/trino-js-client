@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig, RawAxiosRequestHeaders } from 'axios';
+import axios, {AxiosRequestConfig, RawAxiosRequestHeaders} from 'axios';
 import * as https from 'https';
 import * as tls from 'tls';
 import { Encoding, SpooledProtocolResponse, SpoolingProcessor } from './spooling';
@@ -270,6 +270,16 @@ class Client {
    * @returns A promise that resolves to a QueryResult object.
    */
   async query(query: Query | string): Promise<Iterator<QueryResult>> {
+    const result = await this.submitQuery(query);
+    return this.consumeResults(result);
+  }
+
+  /**
+   * Submits a query for execution and returns the initial QueryResult.
+   * @param {Query | string} query - The query to execute.
+   * @returns A promise that resolves to the initial QueryResult object.
+   */
+  async submitQuery(query: Query | string): Promise<QueryResult> {
     const req = typeof query === 'string' ? {query} : query;
     const headers: RawAxiosRequestHeaders = {
       [TRINO_USER_HEADER]: req.user,
@@ -290,9 +300,16 @@ class Client {
       data: req.query,
       headers: cleanHeaders(headers),
     };
-    return this.request<QueryResult>(requestConfig).then(
-      result => new Iterator(new QueryIterator(this, result))
-    );
+    return this.request<QueryResult>(requestConfig);
+  }
+
+  /**
+   * Consumes query results starting from the provided QueryResult.
+   * @param {QueryResult} queryResult - The initial QueryResult to start consuming from.
+   * @returns An Iterator for the query results.
+   */
+  consumeResults(queryResult: QueryResult): Iterator<QueryResult> {
+    return new Iterator(new QueryIterator(this, queryResult));
   }
 
   /**
@@ -445,6 +462,24 @@ export class Trino {
    */
   async query(query: Query | string): Promise<Iterator<QueryResult>> {
     return this.client.query(query);
+  }
+
+  /**
+   * Submits a query for execution and returns the initial QueryResult.
+   * @param query - The query to execute.
+   * @returns A promise that resolves to the initial QueryResult object.
+   */
+  async submitQuery(query: Query | string): Promise<QueryResult> {
+    return this.client.submitQuery(query);
+  }
+
+  /**
+   * Consumes query results starting from the provided QueryResult.
+   * @param queryResult - The initial QueryResult to start consuming from.
+   * @returns An Iterator for the query results.
+   */
+  consumeResults(queryResult: QueryResult): Iterator<QueryResult> {
+    return this.client.consumeResults(queryResult);
   }
 
   /**
