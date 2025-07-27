@@ -65,10 +65,63 @@ const data: QueryData[] = await iter
   .fold<QueryData[]>([], (row, acc) => [...acc, ...row]);
 ```
 
+### Spooling Protocol
+
+The client supports the Trino spooling protocol, which requires [a Trino server with spooling protocol support](https://trino.io/docs/current/client/client-protocol.html#spooling-protocol).
+
+Enable the spooling protocol by specifying a supported encoding in the `encoding` parameter:
+
+Supported encodings are `json`, `json+lz4` and `json+zstd`.
+
+```typescript
+const trino = Trino.create({
+  server: 'http://localhost:8080',
+  catalog: 'tpcds',
+  schema: 'sf100000',
+  auth: new BasicAuth('test'),
+  encoding: 'json+zstd',
+});
+```
+
+Or specify a list of supported encodings in order of preference:
+
+```typescript
+const trino = Trino.create({
+  server: 'http://localhost:8080',
+  catalog: 'tpcds',
+  schema: 'sf100000',
+  auth: new BasicAuth('test'),
+  encoding: ['json+zstd', 'json'],
+});
+```
+
 ## Examples
 
 More usage examples can be found in the
 [integration tests](https://github.com/trinodb/trino-js-client/blob/main/tests/it/client.spec.ts).
+
+### Spooling Protocol Example
+
+```typescript
+import {Trino, BasicAuth} from 'trino-client';
+
+// Create a client with spooling protocol support
+const trino = Trino.create({
+  server: 'http://localhost:8080',
+  catalog: 'tpcds',
+  schema: 'sf100000',
+  auth: new BasicAuth('test'),
+  encoding: 'json+zstd', // Enable spooling with zstd compression
+});
+
+// Execute a query with spooling
+const iter = await trino.query('SELECT * FROM customer LIMIT 1000');
+
+// Process results
+for await (const result of iter) {
+  console.log(`Processed ${result.data?.length || 0} rows`);
+}
+```
 
 ## Build
 
@@ -131,6 +184,19 @@ command in a separate terminal:
 
 ```shell
 kubectl -n trino-system port-forward svc/trino 8080:8080
+```
+
+For spooling protocol tests, also ensure MinIO is accessible on port `9000`. 
+Run the following command in another separate terminal:
+
+```shell
+kubectl apply -f tests/it/minio.yml
+kubectl -n trino-system port-forward svc/minio 9000:9000
+```
+
+Additionally, add the following entry to your `/etc/hosts` file so the client can resolve MinIO service URIs:
+```
+127.0.0.1 minio
 ```
 
 Run tests:

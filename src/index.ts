@@ -1,6 +1,7 @@
 import axios, {AxiosRequestConfig, RawAxiosRequestHeaders} from 'axios';
 import * as https from 'https';
 import * as tls from 'tls';
+import { Encoding, SpooledProtocolResponse, SpoolingProcessor } from './spooling';
 
 const DEFAULT_SERVER = 'http://localhost:8080';
 const DEFAULT_SOURCE = 'trino-js-client';
@@ -23,6 +24,7 @@ const TRINO_SET_SESSION_HEADER = TRINO_HEADER_PREFIX + 'Set-Session';
 const TRINO_CLEAR_SESSION_HEADER = TRINO_HEADER_PREFIX + 'Clear-Session';
 const TRINO_SET_ROLE_HEADER = TRINO_HEADER_PREFIX + 'Set-Role';
 const TRINO_EXTRA_CREDENTIAL_HEADER = TRINO_HEADER_PREFIX + 'Extra-Credential';
+const TRINO_ENCODING_HEADER = TRINO_HEADER_PREFIX + 'Query-Data-Encoding';
 
 export type AuthType = string;
 
@@ -63,6 +65,8 @@ export type ConnectionOptions = {
   readonly extraCredential?: ExtraCredential;
   readonly ssl?: SecureContextOptions;
   readonly extraHeaders?: RequestHeaders;
+  readonly encoding?: Encoding | Encoding[];
+  readonly timeout?: number;
 };
 
 export type QueryStage = {
@@ -151,6 +155,7 @@ export type Query = {
   session?: Session;
   extraCredential?: ExtraCredential;
   extraHeaders?: RequestHeaders;
+  encoding?: Encoding | Encoding[];
 };
 
 /**
@@ -182,6 +187,7 @@ class Client {
     const clientConfig: AxiosRequestConfig = {
       baseURL: options.server ?? DEFAULT_SERVER,
       httpsAgent: agent,
+      timeout: options.timeout,
     };
 
     const headers: RawAxiosRequestHeaders = {
@@ -193,6 +199,9 @@ class Client {
       [TRINO_EXTRA_CREDENTIAL_HEADER]: encodeAsString(
         options.extraCredential ?? {}
       ),
+      [TRINO_ENCODING_HEADER]: Array.isArray(options.encoding)
+        ? options.encoding.join(',')
+        : options.encoding,
       ...(options.extraHeaders ?? {}),
     };
 
@@ -261,6 +270,16 @@ class Client {
    * @returns A promise that resolves to a QueryResult object.
    */
   async query(query: Query | string): Promise<Iterator<QueryResult>> {
+    const result = await this.submitQuery(query);
+    return this.consumeResults(result);
+  }
+
+  /**
+   * Submits a query for execution and returns the initial QueryResult.
+   * @param {Query | string} query - The query to execute.
+   * @returns A promise that resolves to the initial QueryResult object.
+   */
+  async submitQuery(query: Query | string): Promise<QueryResult> {
     const req = typeof query === 'string' ? {query} : query;
     const headers: RawAxiosRequestHeaders = {
       [TRINO_USER_HEADER]: req.user,
@@ -270,6 +289,9 @@ class Client {
       [TRINO_EXTRA_CREDENTIAL_HEADER]: encodeAsString(
         req.extraCredential ?? {}
       ),
+      [TRINO_ENCODING_HEADER]: Array.isArray(req.encoding)
+        ? req.encoding.join(',')
+        : req.encoding,
     ...(req.extraHeaders ?? {})
     };
     const requestConfig = {
@@ -278,9 +300,16 @@ class Client {
       data: req.query,
       headers: cleanHeaders(headers),
     };
-    return this.request<QueryResult>(requestConfig).then(
-      result => new Iterator(new QueryIterator(this, result))
-    );
+    return this.request<QueryResult>(requestConfig);
+  }
+
+  /**
+   * Consumes query results starting from the provided QueryResult.
+   * @param {QueryResult} queryResult - The initial QueryResult to start consuming from.
+   * @returns An Iterator for the query results.
+   */
+  consumeResults(queryResult: QueryResult): Iterator<QueryResult> {
+    return new Iterator(new QueryIterator(this, queryResult));
   }
 
   /**
@@ -392,6 +421,19 @@ export class QueryIterator implements AsyncIterableIterator<QueryResult> {
       url: this.queryResult.nextUri,
     });
 
+    // Handle spooling protocol if present
+    if (SpoolingProcessor.isSpoolingResponse(this.queryResult.data)) {
+      const spooledData = this.queryResult.data as unknown as SpooledProtocolResponse;
+      const segments = SpoolingProcessor.toSegments(spooledData);
+      const processedRows = await SpoolingProcessor.processSegments(segments);
+      
+      // Replace the spooled data with processed rows
+      this.queryResult = {
+        ...this.queryResult,
+        data: processedRows
+      };
+    }
+
     const data = this.queryResult.data ?? [];
     if (data.length === 0) {
       if (this.hasNext()) {
@@ -420,6 +462,24 @@ export class Trino {
    */
   async query(query: Query | string): Promise<Iterator<QueryResult>> {
     return this.client.query(query);
+  }
+
+  /**
+   * Submits a query for execution and returns the initial QueryResult.
+   * @param query - The query to execute.
+   * @returns A promise that resolves to the initial QueryResult object.
+   */
+  async submitQuery(query: Query | string): Promise<QueryResult> {
+    return this.client.submitQuery(query);
+  }
+
+  /**
+   * Consumes query results starting from the provided QueryResult.
+   * @param queryResult - The initial QueryResult to start consuming from.
+   * @returns An Iterator for the query results.
+   */
+  consumeResults(queryResult: QueryResult): Iterator<QueryResult> {
+    return this.client.consumeResults(queryResult);
   }
 
   /**

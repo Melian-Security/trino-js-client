@@ -15,6 +15,97 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@antoniomuso/lz4-napi-android-arm-eabi@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-android-arm-eabi@npm:2.9.0"
+  conditions: os=android & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-android-arm64@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-android-arm64@npm:2.9.0"
+  conditions: os=android & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-darwin-arm64@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-darwin-arm64@npm:2.9.0"
+  conditions: os=darwin & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-darwin-x64@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-darwin-x64@npm:2.9.0"
+  conditions: os=darwin & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-freebsd-x64@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-freebsd-x64@npm:2.9.0"
+  conditions: os=freebsd & cpu=x64
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-linux-arm-gnueabihf@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-linux-arm-gnueabihf@npm:2.9.0"
+  conditions: os=linux & cpu=arm
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-linux-arm64-gnu@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-linux-arm64-gnu@npm:2.9.0"
+  conditions: os=linux & cpu=arm64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-linux-arm64-musl@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-linux-arm64-musl@npm:2.9.0"
+  conditions: os=linux & cpu=arm64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-linux-x64-gnu@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-linux-x64-gnu@npm:2.9.0"
+  conditions: os=linux & cpu=x64 & libc=glibc
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-linux-x64-musl@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-linux-x64-musl@npm:2.9.0"
+  conditions: os=linux & cpu=x64 & libc=musl
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-win32-arm64-msvc@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-win32-arm64-msvc@npm:2.9.0"
+  conditions: os=win32 & cpu=arm64
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-win32-ia32-msvc@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-win32-ia32-msvc@npm:2.9.0"
+  conditions: os=win32 & cpu=ia32
+  languageName: node
+  linkType: hard
+
+"@antoniomuso/lz4-napi-win32-x64-msvc@npm:2.9.0":
+  version: 2.9.0
+  resolution: "@antoniomuso/lz4-napi-win32-x64-msvc@npm:2.9.0"
+  conditions: os=win32 & cpu=x64
+  languageName: node
+  linkType: hard
+
 "@babel/code-frame@npm:^7.0.0, @babel/code-frame@npm:^7.12.13, @babel/code-frame@npm:^7.24.7":
   version: 7.24.7
   resolution: "@babel/code-frame@npm:7.24.7"
@@ -875,6 +966,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@napi-rs/triples@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "@napi-rs/triples@npm:1.2.0"
+  checksum: d02eadfaf61db1b92f8de213e7c9732b1e3ef7650a23c2d325b90d3ee58b158bf4bd731e98a7b4649159aca9435a31f71b155f037a3ee5ea6283ed86eb90f63d
+  languageName: node
+  linkType: hard
+
+"@node-rs/helper@npm:^1.3.3":
+  version: 1.6.0
+  resolution: "@node-rs/helper@npm:1.6.0"
+  dependencies:
+    "@napi-rs/triples": ^1.2.0
+  checksum: 4ab9aa4d848affdee19475330c60d2465127e63c66a400f63c6b09167f2ab7af8281b58b3917e844dc8600e3552033c2dab17e9cccd9a9b19ce3a868ff255884
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -1156,12 +1263,30 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^22.3.0":
+"@types/lz4@npm:^0.6.4":
+  version: 0.6.4
+  resolution: "@types/lz4@npm:0.6.4"
+  dependencies:
+    "@types/node": "*"
+  checksum: c0d4dc86b3bfce6e5d4e51c9714265647c8803f6cba5229f2d0f3fbd195d8d641e3f48b4ac65762a77ef15e620794d068e0a7455f697b8515dcffea9bedb0e12
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:*":
   version: 22.15.3
   resolution: "@types/node@npm:22.15.3"
   dependencies:
     undici-types: ~6.21.0
   checksum: 26618a9fdfb84de3841e898b7c5fd372e1c0bdb9adc3ec71c12c38dd07d4e73da14681924919d27ff509ebf3714b8de941a21f51c26146cc8aaae31561ca7a5c
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^24.1.0":
+  version: 24.1.0
+  resolution: "@types/node@npm:24.1.0"
+  dependencies:
+    undici-types: ~7.8.0
+  checksum: 01f9a97909eec619d937af3bc00ac49461e1846656b4d060f648145df06508eb6d77c200637a792481ee93a73976ced46cfbbdfe307e79be0f58ccdc415dfcd2
   languageName: node
   linkType: hard
 
@@ -1640,6 +1765,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"base64-js@npm:^1.3.1":
+  version: 1.5.1
+  resolution: "base64-js@npm:1.5.1"
+  checksum: 669632eb3745404c2f822a18fc3a0122d2f9a7a13f7fb8b5823ee19d1d2ff9ee5b52c53367176ea4ad093c332fd5ab4bd0ebae5a8e27917a4105a4cfc86b1005
+  languageName: node
+  linkType: hard
+
 "brace-expansion@npm:^1.1.7":
   version: 1.1.11
   resolution: "brace-expansion@npm:1.1.11"
@@ -1704,6 +1836,16 @@ __metadata:
   version: 1.1.2
   resolution: "buffer-from@npm:1.1.2"
   checksum: 0448524a562b37d4d7ed9efd91685a5b77a50672c556ea254ac9a6d30e3403a517d8981f10e565db24e8339413b43c97ca2951f10e399c6125a0d8911f5679bb
+  languageName: node
+  linkType: hard
+
+"buffer@npm:^5.2.1":
+  version: 5.7.1
+  resolution: "buffer@npm:5.7.1"
+  dependencies:
+    base64-js: ^1.3.1
+    ieee754: ^1.1.13
+  checksum: e2cf8429e1c4c7b8cbd30834ac09bd61da46ce35f5c22a78e6c2f04497d6d25541b16881e30a019c6fd3154150650ccee27a308eff3e26229d788bbdeb08ab84
   languageName: node
   linkType: hard
 
@@ -1934,6 +2076,13 @@ __metadata:
     shebang-command: ^2.0.0
     which: ^2.0.1
   checksum: 8d306efacaf6f3f60e0224c287664093fa9185680b2d195852ba9a863f85d02dcc737094c6e512175f8ee0161f9b87c73c6826034c2422e39de7d6569cf4503b
+  languageName: node
+  linkType: hard
+
+"cuint@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "cuint@npm:0.2.2"
+  checksum: b8127a93a7f16ce120ffcb22108014327c9808b258ee20e7dbb4c6740d7cb0f0c12d18a054eb716b0f2470090666abaae8a082d3cd5ef0e94fa447dd155842c4
   languageName: node
   linkType: hard
 
@@ -2521,6 +2670,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fzstd@npm:^0.1.1":
+  version: 0.1.1
+  resolution: "fzstd@npm:0.1.1"
+  checksum: a06cc21096bbec787d99c4b1b9998fd6883c2e4e6550633956738992d6e49f94f027962c2d1a5f8d18f3b27ad630bb7d6b51dd3121dded8f9c8c854ff553a79a
+  languageName: node
+  linkType: hard
+
 "gensync@npm:^1.0.0-beta.2":
   version: 1.0.0-beta.2
   resolution: "gensync@npm:1.0.0-beta.2"
@@ -2695,6 +2851,13 @@ __metadata:
   dependencies:
     safer-buffer: ">= 2.1.2 < 3.0.0"
   checksum: 3f60d47a5c8fc3313317edfd29a00a692cc87a19cac0159e2ce711d0ebc9019064108323b5e493625e25594f11c6236647d8e256fbe7a58f4a3b33b89e6d30bf
+  languageName: node
+  linkType: hard
+
+"ieee754@npm:^1.1.13":
+  version: 1.2.1
+  resolution: "ieee754@npm:1.2.1"
+  checksum: 5144c0c9815e54ada181d80a0b810221a253562422e7c6c3a60b1901154184f49326ec239d618c416c1c5945a2e197107aee8d986a3dd836b53dffefd99b5e7e
   languageName: node
   linkType: hard
 
@@ -3576,6 +3739,75 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lz4-napi@npm:^2.9.0":
+  version: 2.9.0
+  resolution: "lz4-napi@npm:2.9.0"
+  dependencies:
+    "@antoniomuso/lz4-napi-android-arm-eabi": 2.9.0
+    "@antoniomuso/lz4-napi-android-arm64": 2.9.0
+    "@antoniomuso/lz4-napi-darwin-arm64": 2.9.0
+    "@antoniomuso/lz4-napi-darwin-x64": 2.9.0
+    "@antoniomuso/lz4-napi-freebsd-x64": 2.9.0
+    "@antoniomuso/lz4-napi-linux-arm-gnueabihf": 2.9.0
+    "@antoniomuso/lz4-napi-linux-arm64-gnu": 2.9.0
+    "@antoniomuso/lz4-napi-linux-arm64-musl": 2.9.0
+    "@antoniomuso/lz4-napi-linux-x64-gnu": 2.9.0
+    "@antoniomuso/lz4-napi-linux-x64-musl": 2.9.0
+    "@antoniomuso/lz4-napi-win32-arm64-msvc": 2.9.0
+    "@antoniomuso/lz4-napi-win32-ia32-msvc": 2.9.0
+    "@antoniomuso/lz4-napi-win32-x64-msvc": 2.9.0
+    "@node-rs/helper": ^1.3.3
+  dependenciesMeta:
+    "@antoniomuso/lz4-napi-android-arm-eabi":
+      optional: true
+    "@antoniomuso/lz4-napi-android-arm64":
+      optional: true
+    "@antoniomuso/lz4-napi-darwin-arm64":
+      optional: true
+    "@antoniomuso/lz4-napi-darwin-x64":
+      optional: true
+    "@antoniomuso/lz4-napi-freebsd-x64":
+      optional: true
+    "@antoniomuso/lz4-napi-linux-arm-gnueabihf":
+      optional: true
+    "@antoniomuso/lz4-napi-linux-arm64-gnu":
+      optional: true
+    "@antoniomuso/lz4-napi-linux-arm64-musl":
+      optional: true
+    "@antoniomuso/lz4-napi-linux-x64-gnu":
+      optional: true
+    "@antoniomuso/lz4-napi-linux-x64-musl":
+      optional: true
+    "@antoniomuso/lz4-napi-win32-arm64-msvc":
+      optional: true
+    "@antoniomuso/lz4-napi-win32-ia32-msvc":
+      optional: true
+    "@antoniomuso/lz4-napi-win32-x64-msvc":
+      optional: true
+  checksum: 5482686abe27d83e0290cccb440fd12298e83caa197795e810f65d3ab6b4b76b676ea29e67076d6477a76ad675d4699e267a9094b7f9a325a5f13cadba1e699f
+  languageName: node
+  linkType: hard
+
+"lz4-wasm@npm:^0.9.2":
+  version: 0.9.2
+  resolution: "lz4-wasm@npm:0.9.2"
+  checksum: 57f47e434e39c6dc8c7f82ec6c8ceb0016517e19c28f5987fffe7beb19c2bfb52473d982d6364ec3f83144f71554b7f6e088ee699c4f324e4f02128a71f48a61
+  languageName: node
+  linkType: hard
+
+"lz4@npm:^0.6.5":
+  version: 0.6.5
+  resolution: "lz4@npm:0.6.5"
+  dependencies:
+    buffer: ^5.2.1
+    cuint: ^0.2.2
+    nan: ^2.13.2
+    node-gyp: latest
+    xxhashjs: ^0.2.2
+  checksum: 3ecf2a95117aa02c67ddb79a992669f46098208d28ea56eec4a32049527a9fdf714f868a4ffdf0e32131c0474741e2749b6f49f12b1b5e9bc99c6fdcbbfab599
+  languageName: node
+  linkType: hard
+
 "make-dir@npm:^4.0.0":
   version: 4.0.0
   resolution: "make-dir@npm:4.0.0"
@@ -3815,6 +4047,15 @@ __metadata:
   version: 2.1.2
   resolution: "ms@npm:2.1.2"
   checksum: 673cdb2c3133eb050c745908d8ce632ed2c02d85640e2edb3ace856a2266a813b30c613569bf3354fdf4ea7d1a1494add3bfa95e2713baa27d0c2c71fc44f58f
+  languageName: node
+  linkType: hard
+
+"nan@npm:^2.13.2":
+  version: 2.23.0
+  resolution: "nan@npm:2.23.0"
+  dependencies:
+    node-gyp: latest
+  checksum: 2d1fd612d69d4cf4dd63c8ce61ee6aa36ace2caf5363c98b3232833fc24ab761fb96742682997716dea5fb9abf57e2fe7e94e76e0c4c302ed1fcde5b908f3e8f
   languageName: node
   linkType: hard
 
@@ -4570,12 +4811,17 @@ __metadata:
     "@eslint/js": 9.25.1
     "@types/eslint__js": ^8.42.3
     "@types/jest": ^29.5.14
-    "@types/node": ^22.3.0
+    "@types/lz4": ^0.6.4
+    "@types/node": ^24.1.0
     axios: 1.9.0
     eslint: 9.25.1
     eslint-plugin-jest: ^28.9.0
+    fzstd: ^0.1.1
     jest: ^29.7.0
     jiti: ^2.4.0
+    lz4: ^0.6.5
+    lz4-napi: ^2.9.0
+    lz4-wasm: ^0.9.2
     prettier: ^3.0.0
     ts-jest: ^29.2.5
     ts-node: ^10.9.2
@@ -4774,6 +5020,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"undici-types@npm:~7.8.0":
+  version: 7.8.0
+  resolution: "undici-types@npm:7.8.0"
+  checksum: 59521a5b9b50e72cb838a29466b3557b4eacbc191a83f4df5a2f7b156bc8263072b145dc4bb8ec41da7d56a7e9b178892458da02af769243d57f801a50ac5751
+  languageName: node
+  linkType: hard
+
 "unique-filename@npm:^3.0.0":
   version: 3.0.0
   resolution: "unique-filename@npm:3.0.0"
@@ -4907,6 +5160,15 @@ __metadata:
     imurmurhash: ^0.1.4
     signal-exit: ^3.0.7
   checksum: 5da60bd4eeeb935eec97ead3df6e28e5917a6bd317478e4a85a5285e8480b8ed96032bbcc6ecd07b236142a24f3ca871c924ec4a6575e623ec1b11bf8c1c253c
+  languageName: node
+  linkType: hard
+
+"xxhashjs@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "xxhashjs@npm:0.2.2"
+  dependencies:
+    cuint: ^0.2.2
+  checksum: cf6baf05bafe5651dbf108008bafdb1ebe972f65228633f00b56c49d7a1e614a821fe3345c4eb27462994c7c954d982eae05871be6a48146f30803dd87f3c3b6
   languageName: node
   linkType: hard
 

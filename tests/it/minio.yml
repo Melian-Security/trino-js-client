@@ -1,0 +1,112 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: trino-system
+---
+# MinIO deployment for spooling storage
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+  namespace: trino-system
+  labels:
+    app: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+        - name: minio
+          image: minio/minio:latest
+          args:
+            - server
+            - /data
+            - --console-address
+            - ":9001"
+          env:
+            - name: MINIO_ROOT_USER
+              value: "minioadmin"
+            - name: MINIO_ROOT_PASSWORD
+              value: "minioadmin"
+            - name: MINIO_SERVER_URL
+              value: "http://minio:9000"
+            - name: MINIO_BROWSER_REDIRECT_URL
+              value: "http://minio-console.127.0.0.1.nip.io:30901"
+          ports:
+            - containerPort: 9000
+              name: api
+            - containerPort: 9001
+              name: console
+          volumeMounts:
+            - name: minio-storage
+              mountPath: /data
+          resources:
+            requests:
+              cpu: "100m"
+              memory: 256Mi
+      volumes:
+        - name: minio-storage
+          emptyDir: {}
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+  namespace: trino-system
+  labels:
+    app: minio
+spec:
+  type: NodePort
+  ports:
+    - port: 9000
+      targetPort: api
+      protocol: TCP
+      name: api
+      nodePort: 30900  # External access on port 30900
+    - port: 9001
+      targetPort: console
+      protocol: TCP
+      name: console
+      nodePort: 30901  # Console access on port 30901
+  selector:
+    app: minio
+
+---
+# Job to create MinIO bucket for spooling
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-setup
+  namespace: trino-system
+spec:
+  template:
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: mc
+          image: minio/mc:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              mc alias set minio http://minio:9000 minioadmin minioadmin
+              mc mb minio/spooling --ignore-existing
+              echo "Spooling bucket created successfully"
+      initContainers:
+        - name: wait-for-minio
+          image: busybox:1.36
+          command:
+            - /bin/sh
+            - -c
+            - |
+              until nc -z minio 9000; do
+                echo "Waiting for MinIO..."
+                sleep 2
+              done
+              echo "MinIO is ready" 

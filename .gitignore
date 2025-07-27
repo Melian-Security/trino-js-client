@@ -19,3 +19,4 @@ docs
 .pnp.*
 
 node_modules
+.vscode
