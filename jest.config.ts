@@ -8,7 +8,7 @@ import type {Config} from 'jest';
 const config: Config = {
   clearMocks: true,
   coverageProvider: 'v8',
-  moduleFileExtensions: ['js', 'ts'],
+  moduleFileExtensions: ['js', 'ts', 'node'],
   preset: 'ts-jest',
   testEnvironment: 'node',
   verbose: true,
