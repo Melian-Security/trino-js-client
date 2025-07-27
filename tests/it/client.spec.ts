@@ -176,3 +176,117 @@ describe('trino', () => {
     expect(sales).toHaveLength(limit);
   });
 });
+
+// Spooling protocol tests for different encodings
+describe('trino spooling protocol', () => {
+  const smallResultQuery = 'select * from customer limit 100';
+
+  test.concurrent('spooling with json encoding', async () => {
+    const trino = Trino.create({
+      catalog: 'tpcds',
+      schema: 'sf100000',
+      auth: new BasicAuth('test'),
+      encoding: 'json', // Force uncompressed JSON spooling
+    });
+
+    const iter = await trino.query(smallResultQuery);
+    const data = await iter
+      .map(r => r.data ?? [])
+      .fold<QueryData[]>([], (row, acc) => [...acc, ...row]);
+
+    expect(data.length).toBeGreaterThan(0);
+    expect(data.length).toBe(100); // customer table limited to 100 rows
+    
+    // Verify we actually got meaningful data
+    expect(data[0]).toBeDefined();
+    expect(Array.isArray(data[0])).toBe(true);
+    expect(data[0].length).toBe(18); // customer table has 18 columns
+  });
+
+  test.concurrent('spooling with json+lz4 encoding', async () => {
+    const trino = Trino.create({
+      catalog: 'tpcds',
+      schema: 'sf100000',
+      auth: new BasicAuth('test'),
+      encoding: 'json+lz4', // Force LZ4 compressed spooling
+    });
+
+    const iter = await trino.query(smallResultQuery);
+    const data = await iter
+      .map(r => r.data ?? [])
+      .fold<QueryData[]>([], (row, acc) => [...acc, ...row]);
+
+    expect(data.length).toBe(100); // customer table limited to 100 rows
+    
+    // Verify we actually got meaningful data
+    expect(data[0]).toBeDefined();
+    expect(Array.isArray(data[0])).toBe(true);
+    expect(data[0].length).toBe(18); // customer table has 18 columns
+  });
+
+  test.concurrent('spooling with json+zstd encoding', async () => {
+    const trino = Trino.create({
+      catalog: 'tpcds',
+      schema: 'sf100000',
+      auth: new BasicAuth('test'),
+      encoding: 'json+zstd', // Force ZStandard compressed spooling
+    });
+
+    const iter = await trino.query(smallResultQuery);
+    const data = await iter
+      .map(r => r.data ?? [])
+      .fold<QueryData[]>([], (row, acc) => [...acc, ...row]);
+
+    expect(data.length).toBe(100);
+    
+    // Verify we actually got meaningful data
+    expect(data[0]).toBeDefined();
+    expect(Array.isArray(data[0])).toBe(true);
+    expect(data[0].length).toBe(18); // customer table has 18 columns
+  });
+
+  test.concurrent('spooling with multiple encodings preference', async () => {
+    const trino = Trino.create({
+      catalog: 'tpcds',
+      schema: 'sf100000',
+      auth: new BasicAuth('test'),
+      encoding: ['json+zstd', 'json+lz4', 'json'], // Server will pick best available
+    });
+
+    const iter = await trino.query(smallResultQuery);
+    const data = await iter
+      .map(r => r.data ?? [])
+      .fold<QueryData[]>([], (row, acc) => [...acc, ...row]);
+
+    expect(data.length).toBe(100);
+    
+    // Verify we actually got meaningful data
+    expect(data[0]).toBeDefined();
+    expect(Array.isArray(data[0])).toBe(true);
+    expect(data[0].length).toBe(18); // customer table has 18 columns
+  });
+
+  test.concurrent('spooling with very large result set', async () => {
+    const trino = Trino.create({
+      catalog: 'tpcds',
+      schema: 'sf100000',
+      auth: new BasicAuth('test'),
+      encoding: 'json+zstd', 
+    });
+
+    // Use customer table which we know has data, with a larger limit
+    const massiveQuery = `SELECT * FROM customer LIMIT 100000`;
+        
+    const iter = await trino.query(massiveQuery);
+    const data = await iter
+      .map(r => r.data ?? [])
+      .fold<QueryData[]>([], (row, acc) => [...acc, ...row]); 
+
+    expect(data.length).toBe(100000)
+    
+    // Verify we got valid customer table structure (18 columns)
+    expect(data[0]).toBeDefined();
+    expect(Array.isArray(data[0])).toBe(true);
+    expect(data[0].length).toBe(18); // customer table has 18 columns
+  });
+});

@@ -52,9 +52,31 @@ data:
     http-server.http.port=8080
     discovery-server.enabled=true
     discovery.uri=http://localhost:8080
+    
+    # Enable spooling protocol
+    protocol.spooling.enabled=true
+    protocol.spooling.shared-secret-key=jxTKysfCBuMZtFqUf8UJDQ1w9ez8rynEJsJqgJf66u0=
 
   log.properties: |
     io.trino=INFO
+
+  spooling-manager.properties: |
+    # Use filesystem-based spooling manager
+    spooling-manager.name=filesystem
+    
+    # Enable S3-compatible storage
+    fs.s3.enabled=true
+    fs.location=s3://spooling/data
+    
+    # MinIO S3-compatible configuration
+    s3.endpoint=http://localhost:9000/
+    s3.region=fake
+    s3.aws-access-key=minioadmin
+    s3.aws-secret-key=minioadmin
+    s3.path-style-access=true
+    
+    # Disable server-side encryption for test environment
+    fs.segment.encryption=false
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -82,8 +104,31 @@ data:
     http-server.http.port=8080
     discovery.uri=http://trino:8080
 
+    # Enable spooling protocol
+    protocol.spooling.enabled=true
+    protocol.spooling.shared-secret-key=jxTKysfCBuMZtFqUf8UJDQ1w9ez8rynEJsJqgJf66u0=
+    protocol.spooling.inlining.max-rows=2
+
   log.properties: |
     io.trino=INFO
+
+  spooling-manager.properties: |
+    # Use filesystem-based spooling manager
+    spooling-manager.name=filesystem
+    
+    # Enable S3-compatible storage
+    fs.s3.enabled=true
+    fs.location=s3://spooling/data
+    
+    # MinIO S3-compatible configuration
+    s3.endpoint=http://localhost:9000/
+    s3.region=fake
+    s3.aws-access-key=minioadmin
+    s3.aws-secret-key=minioadmin
+    s3.path-style-access=true
+    
+    # Disable server-side encryption for test environment
+    fs.segment.encryption=false
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -105,6 +150,7 @@ spec:
         component: coordinator
     spec:
       serviceAccountName: trino
+      hostNetwork: true
       securityContext:
         fsGroup: 9999
       volumes:
@@ -161,6 +207,7 @@ spec:
         component: worker
     spec:
       serviceAccountName: trino
+      hostNetwork: true
       volumes:
         - name: config-volume
           configMap:
