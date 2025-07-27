@@ -69,7 +69,7 @@ data:
     fs.location=s3://spooling/data
     
     # MinIO S3-compatible configuration
-    s3.endpoint=http://localhost:9000/
+    s3.endpoint=http://minio:9000
     s3.region=fake
     s3.aws-access-key=minioadmin
     s3.aws-secret-key=minioadmin
@@ -121,7 +121,7 @@ data:
     fs.location=s3://spooling/data
     
     # MinIO S3-compatible configuration
-    s3.endpoint=http://localhost:9000/
+    s3.endpoint=http://minio:9000
     s3.region=fake
     s3.aws-access-key=minioadmin
     s3.aws-secret-key=minioadmin
@@ -150,7 +150,6 @@ spec:
         component: coordinator
     spec:
       serviceAccountName: trino
-      hostNetwork: true
       securityContext:
         fsGroup: 9999
       volumes:
@@ -207,7 +206,6 @@ spec:
         component: worker
     spec:
       serviceAccountName: trino
-      hostNetwork: true
       volumes:
         - name: config-volume
           configMap:

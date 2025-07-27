@@ -186,6 +186,19 @@ command in a separate terminal:
 kubectl -n trino-system port-forward svc/trino 8080:8080
 ```
 
+For spooling protocol tests, also ensure MinIO is accessible on port `9000`. 
+Run the following command in another separate terminal:
+
+```shell
+kubectl apply -f tests/it/minio.yml
+kubectl -n trino-system port-forward svc/minio 9000:9000
+```
+
+Additionally, add the following entry to your `/etc/hosts` file so the client can resolve MinIO service URIs:
+```
+127.0.0.1 minio
+```
+
 Run tests:
 
 ```shell

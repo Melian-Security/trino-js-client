@@ -33,6 +33,10 @@ spec:
               value: "minioadmin"
             - name: MINIO_ROOT_PASSWORD
               value: "minioadmin"
+            - name: MINIO_SERVER_URL
+              value: "http://minio.127.0.0.1.nip.io:30900"
+            - name: MINIO_BROWSER_REDIRECT_URL
+              value: "http://minio-console.127.0.0.1.nip.io:30901"
           ports:
             - containerPort: 9000
               name: api
@@ -58,16 +62,18 @@ metadata:
   labels:
     app: minio
 spec:
-  type: ClusterIP
+  type: NodePort
   ports:
     - port: 9000
       targetPort: api
       protocol: TCP
       name: api
+      nodePort: 30900  # External access on port 30900
     - port: 9001
       targetPort: console
       protocol: TCP
       name: console
+      nodePort: 30901  # Console access on port 30901
   selector:
     app: minio
 

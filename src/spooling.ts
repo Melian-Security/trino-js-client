@@ -1,6 +1,24 @@
-import { decompress as zstdDecompress } from 'fzstd';
-import { decompress as lz4Decompress } from 'lz4js';
-import axios from 'axios'; // Added axios import
+import axios from 'axios';
+
+// Optional compression dependencies - gracefully handle missing packages
+let zstdDecompress: ((data: Uint8Array) => ArrayBuffer) | null = null;
+let lz4: any = null;
+
+// Load optional dependencies at runtime
+(async () => {
+  try {
+    const fzstd = await import('fzstd');
+    zstdDecompress = fzstd.decompress;
+  } catch (e) {
+    // fzstd not available
+  }
+
+  try {
+    lz4 = await import('lz4');
+  } catch (e) {
+    // lz4 not available
+  }
+})();
 
 // Encoding types
 export type Encoding = 'json' | 'json+lz4' | 'json+zstd';
@@ -101,7 +119,7 @@ export class SpoolingProcessor {
   /**
    * Process all segments and return combined rows
    */
-  static async processSegments(segments: SegmentWrapper[]): Promise<QueryRows> {
+  static async processSegments(segments: SegmentWrapper[], client: any): Promise<QueryRows> {
     const allRows: QueryRows = [];
 
     for (const segmentWrapper of segments) {
@@ -147,11 +165,13 @@ export class SpoolingProcessor {
             allRows.push(...rows);
           }
 
-          // Acknowledge the segment (fire and forget) - direct to external storage
-          axios.post(spooledSegment.ackUri, null, {
-            headers: requestHeaders,
+          // Acknowledge the segment (fire and forget) - through Trino client
+          client.request({
+            method: 'POST',
+            url: spooledSegment.ackUri,
+            data: null,
             timeout: 2000 // 2 second timeout for acknowledgments
-          }).catch(error => {
+          }).catch((error: Error) => {
             console.warn('Failed to acknowledge segment:', error);
           });
         }
@@ -203,18 +223,36 @@ export class SpoolingProcessor {
 
     switch (encoding) {
       case 'json+zstd':
+        if (!zstdDecompress) {
+          throw new Error('ZStandard decompression not available. Install "fzstd" package: npm install fzstd');
+        }
         try {
           return new Uint8Array(zstdDecompress(dataArray));
         } catch (error) {
           throw new Error(`ZStandard decompression failed: ${error}`);
         }
       
-      case 'json+lz4':
-        try {
-          return lz4Decompress(dataArray);
-        } catch (error) {
-          throw new Error(`LZ4 decompression failed: ${error}`);
+      case 'json+lz4': {
+        if (!lz4) {
+          throw new Error('LZ4 decompression not available. Install "lz4" package: npm install lz4');
         }
+        // Trino sends raw LZ4 block data, use decodeBlock for raw blocks
+        const uncompressedSize = parseInt(_metadata.uncompressedSize || '0');
+        if (uncompressedSize > 0) {
+          // Create output buffer with known uncompressed size
+          const output = Buffer.alloc(uncompressedSize);
+          // Use lz4.decodeBlock for raw block decompression
+          const actualSize = lz4.decodeBlock(Buffer.from(dataArray), output);
+          if (actualSize > 0) {
+            return output.subarray(0, actualSize);
+          } else {
+            throw new Error(`LZ4 decodeBlock failed, returned: ${actualSize}`);
+          }
+        } else {
+          throw new Error('Unknown uncompressed size for LZ4 data');
+        }
+      }
+        
       
       case 'json':
         // No compression
